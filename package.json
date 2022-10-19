@@ -1,0 +1,20 @@
+{
+	"name": "graphql-playground",
+	"type": "module",
+	"version": "1.0.0",
+	"description": "GraphQL API example from Udemy course",
+	"main": "src/index.js",
+	"scripts": {
+		"dev": "node --experimental-specifier-resolution=node src/app.js"
+	},
+	"repository": "git@github.com:Patrick-DS/graphql-playground.git",
+	"author": "Patrick Da Silva <patrick1dasilva@gmail.com>",
+	"license": "GNU General Public License",
+	"dependencies": {
+		"dotenv": "^16.0.3",
+		"express": "^4.18.2",
+		"express-graphql": "^0.12.0",
+		"graphql": "^16.6.0",
+		"lodash": "^4.17.21"
+	}
+}
