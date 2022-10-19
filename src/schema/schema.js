@@ -8,14 +8,30 @@ import axios from "axios"
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const UserIdType = { type: GraphQLInt }
+const IdType = { type: GraphQLInt }
+
+const CompanyObjectType = new GraphQLObjectType({
+	name: "Company",
+	fields: {
+		id: IdType,
+		name: { type: GraphQLString },
+		description: { type: GraphQLString },
+	},
+})
 
 const UserObjectType = new GraphQLObjectType({
 	name: "User",
 	fields: {
-		id: UserIdType,
+		id: IdType,
 		firstName: { type: GraphQLString },
 		age: { type: GraphQLInt },
+		company: {
+			type: CompanyObjectType,
+			resolve: async ({ id }) => {
+				const { data } = await axios.get(`http://localhost:3000/companies/${id}`)
+				return data
+			},
+		},
 	},
 })
 
@@ -24,9 +40,17 @@ const RootQuery = new GraphQLObjectType({
 	fields: {
 		user: {
 			type: UserObjectType,
-			args: { id: UserIdType },
+			args: { id: IdType },
 			resolve: async (parentValue, { id }) => {
 				const { data } = await axios.get(`http://localhost:3000/users/${id}`)
+				return data
+			},
+		},
+		company: {
+			type: CompanyObjectType,
+			args: { id: IdType },
+			resolve: async (parentValue, { id }) => {
+				const { data } = await axios.get(`http://localhost:3000/companies/${id}`)
 				return data
 			},
 		},
