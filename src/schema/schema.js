@@ -89,6 +89,31 @@ const RootMutation = new GraphQLObjectType({
 				return data
 			},
 		},
+		deleteUser: {
+			type: UserObjectType,
+			args: { id: nonNullType(IdType) },
+			resolve: async (parentValue, { id }) => {
+				const { data } = await axios.delete(`http://localhost:3000/users/${id}`)
+				return data
+			},
+		},
+		editUser: {
+			type: UserObjectType,
+			args: {
+				id: nonNullType(IdType),
+				firstName: FirstNameType,
+				age: AgeType,
+				companyId: IdType,
+			},
+			resolve: async (parentValue, { id, firstName, age, companyId }) => {
+				const { data } = await axios.patch(`http://localhost:3000/users/${id}`, {
+					...(firstName ? { firstName } : {}),
+					...(age ? { age } : {}),
+					...(companyId ? { companyId } : {}),
+				})
+				return data
+			},
+		},
 	},
 })
 
