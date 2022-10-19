@@ -1,9 +1,8 @@
 // Third-party imports
 import graphql, { GraphQLInt, GraphQLObjectType, GraphQLString, GraphQLSchema } from "graphql"
-import _ from "lodash"
+import axios from "axios"
 
 // Global imports
-import users from "../data/users.json"
 
 // Local imports
 
@@ -26,7 +25,10 @@ const RootQuery = new GraphQLObjectType({
 		user: {
 			type: UserObjectType,
 			args: { id: UserIdType },
-			resolve: (parentValue, { id }) => _.find(users, { id }),
+			resolve: async (parentValue, { id }) => {
+				const { data } = await axios.get(`http://localhost:3000/users/${id}`)
+				return data
+			},
 		},
 	},
 })
