@@ -1,5 +1,5 @@
 // Third-party imports
-import graphql, { GraphQLInt, GraphQLObjectType, GraphQLString, GraphQLSchema, GraphQLList } from "graphql"
+import { GraphQLInt, GraphQLObjectType, GraphQLString, GraphQLSchema, GraphQLList, GraphQLNonNull } from "graphql"
 import axios from "axios"
 
 // Global imports
@@ -9,13 +9,19 @@ import axios from "axios"
 ////////////////////////////////////////////////////////////////////////////////
 
 const IdType = { type: GraphQLInt }
+const AgeType = { type: GraphQLInt }
+const FirstNameType = { type: GraphQLString }
+const CompanyNameType = { type: GraphQLString }
+const CompanyDescriptionType = { type: GraphQLString }
+
+const nonNullType = graphQLType => ({ type: new GraphQLNonNull(graphQLType.type) })
 
 const CompanyObjectType = new GraphQLObjectType({
 	name: "Company",
 	fields: () => ({
 		id: IdType,
-		name: { type: GraphQLString },
-		description: { type: GraphQLString },
+		name: CompanyNameType,
+		description: CompanyDescriptionType,
 		users: {
 			type: new GraphQLList(UserObjectType),
 			resolve: async ({ id }) => {
@@ -30,8 +36,8 @@ const UserObjectType = new GraphQLObjectType({
 	name: "User",
 	fields: () => ({
 		id: IdType,
-		firstName: { type: GraphQLString },
-		age: { type: GraphQLInt },
+		firstName: FirstNameType,
+		age: AgeType,
 		company: {
 			type: CompanyObjectType,
 			resolve: async ({ id }) => {
@@ -43,7 +49,7 @@ const UserObjectType = new GraphQLObjectType({
 })
 
 const RootQuery = new GraphQLObjectType({
-	name: "RootQueryType",
+	name: "RootQuery",
 	fields: {
 		user: {
 			type: UserObjectType,
@@ -64,8 +70,31 @@ const RootQuery = new GraphQLObjectType({
 	},
 })
 
+const RootMutation = new GraphQLObjectType({
+	name: "RootMutation",
+	fields: {
+		addUser: {
+			type: UserObjectType,
+			args: {
+				firstName: nonNullType(FirstNameType),
+				age: nonNullType(AgeType),
+				companyId: IdType,
+			},
+			resolve: async (parentValue, { firstName, age, companyId }) => {
+				const { data } = await axios.post(`http://localhost:3000/users`, {
+					firstName,
+					age,
+					...(companyId ? { companyId } : {}),
+				})
+				return data
+			},
+		},
+	},
+})
+
 const RootSchema = new GraphQLSchema({
 	query: RootQuery,
+	mutation: RootMutation,
 })
 
 export default RootSchema
