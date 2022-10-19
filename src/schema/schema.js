@@ -40,8 +40,8 @@ const UserObjectType = new GraphQLObjectType({
 		age: AgeType,
 		company: {
 			type: CompanyObjectType,
-			resolve: async ({ id }) => {
-				const { data } = await axios.get(`http://localhost:3000/companies/${id}`)
+			resolve: async ({ companyId }) => {
+				const { data } = await axios.get(`http://localhost:3000/companies/${companyId}`)
 				return data
 			},
 		},
