@@ -1,5 +1,5 @@
 // Third-party imports
-import graphql, { GraphQLInt, GraphQLObjectType, GraphQLString, GraphQLSchema } from "graphql"
+import graphql, { GraphQLInt, GraphQLObjectType, GraphQLString, GraphQLSchema, GraphQLList } from "graphql"
 import axios from "axios"
 
 // Global imports
@@ -12,16 +12,23 @@ const IdType = { type: GraphQLInt }
 
 const CompanyObjectType = new GraphQLObjectType({
 	name: "Company",
-	fields: {
+	fields: () => ({
 		id: IdType,
 		name: { type: GraphQLString },
 		description: { type: GraphQLString },
-	},
+		users: {
+			type: new GraphQLList(UserObjectType),
+			resolve: async ({ id }) => {
+				const { data } = await axios.get(`http://localhost:3000/companies/${id}/users`)
+				return data
+			},
+		},
+	}),
 })
 
 const UserObjectType = new GraphQLObjectType({
 	name: "User",
-	fields: {
+	fields: () => ({
 		id: IdType,
 		firstName: { type: GraphQLString },
 		age: { type: GraphQLInt },
@@ -32,7 +39,7 @@ const UserObjectType = new GraphQLObjectType({
 				return data
 			},
 		},
-	},
+	}),
 })
 
 const RootQuery = new GraphQLObjectType({
