@@ -16,6 +16,7 @@ const envNames = {
 const config = {
 	USE_GRAPHIQL: process.env.NODE_ENV === envNames.DEV,
 	GRAPHQL_API_PORT: process.env.GRAPHQL_API_PORT,
+	JSON_SERVER_URL: process.env.JSON_SERVER_URL,
 }
 
 export default config
